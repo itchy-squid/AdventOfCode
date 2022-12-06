@@ -4,12 +4,8 @@ BEGIN { FS = "" }
     unique = "";
     for(i=1; i<NF; i++)
     {
-        char = $i;
-        idx = index(unique, char);
-
-        if(idx > 0) unique = sprintf("%s%s",substr(unique,idx+1), char)
-        else unique = sprintf("%s%s",unique,char)
-
+        idx = index(unique, $i);
+        unique = sprintf("%s%s",idx > 0 ? substr(unique,idx+1) : unique, $i);
         if(length(unique) >= MATCH_LEN) break;
     }
     
