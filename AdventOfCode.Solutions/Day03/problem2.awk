@@ -1,4 +1,4 @@
-BEGIN { convert="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+BEGIN { convert = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" }
 
 {
     if(NR % 3 != 1) gsub(notPattern,"",$1);
