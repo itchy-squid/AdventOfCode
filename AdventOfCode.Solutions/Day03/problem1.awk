@@ -6,4 +6,4 @@ BEGIN { convert="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" }
     sum += index(convert, substr(left, match(left, sprintf("[%s]",substr($1, len/2 + 1))),1));
 }
 
-END{print sum}
+END { print sum }
