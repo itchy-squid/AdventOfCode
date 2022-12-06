@@ -1,13 +1,15 @@
 BEGIN { convert="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" }
 
-1{
-    len = length($1);
-    left = substr($1, 1, len/2);
-    right = sprintf("[%s]",substr($1, len/2 + 1, len/2));
-    idx = match(left, right);
-    overlappingChar = substr(left,idx,1);
-    score = index(convert, overlappingChar);
-    Sum += score;
-    }
+{
+    if(NR % 3 == 1) pattern = $1;
+    else {
+        patsplit($1, matches, pattern);
+        pattern = "";
+        for (i in matches) pattern = sprintf("%s%s", pattern, matches[i]);
+        }
+
+    pattern = sprintf("[%s]",pattern);
+    if(NR % 3 == 0) Sum += index(convert, substr(pattern,2,1));
+}
 
 END{print Sum}
