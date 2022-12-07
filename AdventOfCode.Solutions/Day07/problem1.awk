@@ -4,8 +4,6 @@
 /dir /{ directories[sprintf("%s/%s",$2,curr)] = 0 }
 
 /[0-9].* /{
-    files[sprintf("%s/%s",$2,curr)] = $1;
-    
     itr = curr;
     while(itr != ""){
         directories[itr] += $1;
