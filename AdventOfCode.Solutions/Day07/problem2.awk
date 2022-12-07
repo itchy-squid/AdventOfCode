@@ -15,7 +15,7 @@
 
 END {
     min = "";
-    remaining = 30000000 - (70000000 - dirs[""]);
+    remaining = dirs[""] - 40000000;
     for(i in dirs) if(dirs[min] > dirs[i] && dirs[i] > remaining) min = i;
     print min,":",dirs[min];
 }
