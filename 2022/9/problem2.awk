@@ -1,4 +1,4 @@
-#Example: awk -f problem2.awk -v LENGTH=9 test.txt
+#Example: awk -f problem2.awk -v LENGTH=10 test.txt
 
 function max(a, b) { return a > b ? a : b; }
 function abs(c) { return c < 0 ? -1 * c : c; }
