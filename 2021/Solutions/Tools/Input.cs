@@ -4,10 +4,10 @@
     {
         public const string InputFilename = "Input.txt";
 
-        public static IEnumerable<string> ReadAllLines(string directory)
+        public static IEnumerable<string> ReadAllLines(string directory, string filename = InputFilename)
         {
-            var file = Path.Combine(Directory.GetCurrentDirectory(), directory, InputFilename);
-            
+            var file = Path.Combine(Directory.GetCurrentDirectory(), directory, filename);
+
             Console.WriteLine($"Reading input from {file}");
             return File.ReadAllLines(file).ToList();
         }

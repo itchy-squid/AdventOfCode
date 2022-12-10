@@ -1,7 +1,5 @@
-﻿using AdventOfCode.Solutions.DataStructures;
-using AdventOfCode.Solutions.Tools;
-using System.Collections.Immutable;
-using System.Text;
+﻿using AdventOfCode.Solutions.Tools;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Solutions.Day21
 {
@@ -9,9 +7,9 @@ namespace AdventOfCode.Solutions.Day21
     {
         public static void Main()
         {
-            var input = Input.ReadAllLines("Day21");
+            var input = Input.ReadAllLines("Day21","test.txt");
 
-            var result = Solve(input);
+            var result = Solve(input, new DeterministicDie(100));
             Console.WriteLine(result);
             Console.WriteLine();
 
@@ -20,36 +18,56 @@ namespace AdventOfCode.Solutions.Day21
             //Console.WriteLine();
         }
 
-        public static int Solve(IEnumerable<string> lines)
+        public static int Solve(IEnumerable<string> lines, IDie die)
         {
-            var die = new Die();
-            var players = new Player[] { new(2), new(1) };
+            var regex = new Regex("Player [0-9]+ starting position: (?<position>[0-9]+)");
 
-            for(var i = 0; players[(i + 1) % players.Length].Score < 1000; i = (i + 1) % players.Length)
+            var players = lines
+                .Select(line => regex.Match(line).Groups["position"].Value)
+                .Select(str => new Player(Int32.Parse(str)))
+                .ToArray();
+
+            var i = -1;
+            do
             {
-                players[i % players.Length].Move(die);
-            }
+                i = (i + 1) % players.Length;
+                players[i].Move(die);
+                Console.WriteLine($"{i}: {players[i].Score}");
 
-            return die.NRolls * players.Where(p => p.Score < 1000).First().Score;
+            } while (players[i].Score < 1000);
+
+            return die.NRolls * players[(i + 1) % players.Length].Score;
         }
     }
 
-    public class Die
+    public interface IDie
     {
+        int NRolls { get; }
+        int Roll();
+    }
+
+    public class DeterministicDie : IDie
+    {
+        private readonly int _size;
         private int _next;
 
         public int NRolls => _next;
 
+        public DeterministicDie(int size)
+        {
+            _size = size;
+        }
+
         public int Roll()
         {
-            return ++_next;
+            _next = (_next % _size) + 1;
+            return _next;
         }
     }
 
     public class Player
     {
         public int Position { get; private set; }
-
         public int Score { get; private set; }
 
         public Player(int start)
@@ -58,11 +76,11 @@ namespace AdventOfCode.Solutions.Day21
             Position = start % 10;
         }
 
-        public void Move(Die die)
+        public void Move(IDie die)
         {
             Position += Enumerable.Range(0, 3).Select(i => die.Roll()).Sum();
             Position %= 10;
-            Score += (Position == 0) ? 10 : Position;
+            Score += Position == 0 ? 10 : Position;
         }
     }
 }
