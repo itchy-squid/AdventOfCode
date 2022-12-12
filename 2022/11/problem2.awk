@@ -12,7 +12,15 @@ BEGIN { FS = "[:, ] *" }
 END {
     SIMP = 1;
     for(i in monkeys) SIMP *= monkeys[i]["test"][1]; 
-    for(r=1; r<=N_ROUNDS; r++) execute_round();
+    for(r=1; r<=N_ROUNDS; r++) 
+    {
+        execute_round();
+        if(r % 1000 == 0 || r == 1 || r == 20) {
+            print "== After round " r " ==";
+            for(i in monkeys) print "monkey " i " inspected " monkeys[i]["inspected"] " times.";
+            print "";
+        }
+    }
     for(i in monkeys) counts[i + 1] = monkeys[i]["inspected"];
     asort(counts);
 

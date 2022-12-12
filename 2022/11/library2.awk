@@ -29,9 +29,8 @@ function inspect(m, w) {
     else if(op == "*") temp = p1 * p2;
     else print "UNKNOWN OPERATOR",m["op"][2];
 
-    temp = temp - (temp % 3);
     temp %= SIMP;
-    w[1] = temp/3;
+    w[1] = temp;
 }
 
 function evaluate(w, x) { return x == "old" ? w : x; }
