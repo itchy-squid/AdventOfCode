@@ -1,4 +1,4 @@
-function execute_round() { for(idx in monkeys) execute_turn(monkeys[idx]); }
+function execute_round() { for(round_i in monkeys) execute_turn(monkeys[round_i]); }
 
 function execute_turn(monkey) {
     # Make worry an array so I can pass by reference.
@@ -23,12 +23,13 @@ function inspect(m, w) {
     op = m["op"][2];
     p1 = evaluate(w[1], m["op"][1]);
     p2 = evaluate(w[1], m["op"][3]);
+    t = m["test"][1];
 
-    if(op == "+") w[1] = p1 + p2;
-    else if(op == "*") w[1] = p1 * p2;
+    if(op == "+") temp = p1 + p2;
+    else if(op == "*") temp = p1 * p2;
     else print "UNKNOWN OPERATOR",m["op"][2];
 
-    w[1] = int(w[1]/3);
+    w[1] = int(temp/3);
 }
 
 function evaluate(w, x) { return x == "old" ? w : x; }

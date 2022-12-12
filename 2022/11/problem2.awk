@@ -1,6 +1,6 @@
-@include "library1.awk"
+@include "library2.awk"
 
-# Ex: awk -f problem1.awk -v N_ROUNDS=20 test.txt
+# Ex: awk -f problem.awk -v N_ROUNDS=20 test.txt
 
 BEGIN { FS = "[:, ] *" }
 /Monkey [0-9]+/ { curr = $2 }
@@ -10,9 +10,12 @@ BEGIN { FS = "[:, ] *" }
 /If (true)|(false): throw to monkey/ { monkeys[curr]["test"][$3 == "true" ? 2 : 3] = $7 }
 
 END {
+    SIMP = 1;
+    for(i in monkeys) SIMP *= monkeys[i]["test"][1]; 
     for(r=1; r<=N_ROUNDS; r++) execute_round();
     for(i in monkeys) counts[i + 1] = monkeys[i]["inspected"];
     asort(counts);
 
-    print counts[length(counts)] * counts[length(counts) - 1];
+    # dump();
+    print counts[length(counts)] " x " counts[length(counts) - 1] " = " (counts[length(counts)] * counts[length(counts) - 1]);
 }
