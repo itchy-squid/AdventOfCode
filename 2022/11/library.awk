@@ -25,11 +25,11 @@ function inspect(m, w) {
     p2 = evaluate(w[1], m["op"][3]);
     t = m["test"][1];
 
-    if(op == "+") temp = p1 + p2;
-    else if(op == "*") temp = p1 * p2;
+    if(op == "+") w[1] = p1 + p2;
+    else if(op == "*") w[1] = p1 * p2;
     else print "UNKNOWN OPERATOR",m["op"][2];
 
-    w[1] = int(temp/3);
+    apply_relief(w);
 }
 
 function evaluate(w, x) { return x == "old" ? w : x; }

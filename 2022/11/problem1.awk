@@ -1,6 +1,7 @@
-@include "library1.awk"
-
 # Ex: awk -f problem1.awk -v N_ROUNDS=20 test.txt
+@include "library.awk"
+
+function apply_relief(w){ w[1] = int(w[1] / 3); }
 
 BEGIN { FS = "[:, ] *" }
 /Monkey [0-9]+/ { curr = $2 }
