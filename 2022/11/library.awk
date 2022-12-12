@@ -1,3 +1,11 @@
+function solve() {
+    for(r=1; r<=N_ROUNDS; r++) execute_round();
+    for(i in monkeys) counts[i + 1] = monkeys[i]["inspected"];
+    asort(counts);
+
+    return counts[length(counts)] * counts[length(counts) - 1];
+}
+
 function execute_round() { for(round_i in monkeys) execute_turn(monkeys[round_i]); }
 
 function execute_turn(monkey) {
