@@ -9,5 +9,10 @@ BEGIN { FS = "[:, ] *" }
 
 END { 
     presolve();
-    print solve();
+    
+    for(r=1; r<=N_ROUNDS; r++) execute_round();
+    for(i in monkeys) counts[i + 1] = monkeys[i]["inspected"];
+    asort(counts);
+
+    print counts[length(counts)] * counts[length(counts) - 1];
 }
