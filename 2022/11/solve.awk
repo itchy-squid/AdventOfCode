@@ -1,4 +1,3 @@
-# Ex: awk -f problem.awk -v PROBLEM=1 test.txt
 @include "library.awk"
 
 BEGIN { FS = "[:, ] *" }

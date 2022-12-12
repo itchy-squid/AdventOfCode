@@ -1,5 +1,5 @@
 # Ex: awk -f problem2.awk test.txt
-@include "base.awk"
+@include "solve.awk"
 
 BEGIN { 
     SIMP = 1;

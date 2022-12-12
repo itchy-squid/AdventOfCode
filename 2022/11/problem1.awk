@@ -1,5 +1,5 @@
 # Ex: awk -f problem1.awk test.txt
-@include "base.awk"
+@include "solve.awk"
 
 BEGIN { N_ROUNDS = 20 }
 
