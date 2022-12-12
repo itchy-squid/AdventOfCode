@@ -1,9 +1,4 @@
-#@include "round.awk"
-
-BEGIN {
-    FS = "[:, ] *";
-    ROUNDMODE = "Z"
-}
+BEGIN { FS = "[:, ] *" }
 
 function round() { 
     for(idx in monkeys) turn(monkeys[idx]);
@@ -20,7 +15,8 @@ function turn(monkey) {
         inspect(monkey, worry);
         throw(monkey, worry);
 
-        # dump();
+        # dump_lite();
+        # print "";
     }
 }
 
@@ -40,7 +36,7 @@ function inspect(m, w) {
     else if(op == "*") w[1] = p1 * p2;
     else print "UNKNOWN OPERATOR",m["op"][2];
 
-    w[1] /= 3;
+    w[1] = int(w[1]/3);
 }
 
 function evaluate(w, x) {
@@ -48,8 +44,11 @@ function evaluate(w, x) {
 }
 
 function throw(m, w) {
+    test = (w[1] % m["test"][1]);
     target = (w[1] % m["test"][1]) == 0 ? m["test"][2] : m["test"][3];
-    monkeys[target]["items"] = monkeys[target]["items"] " " int(w[1]);
+    monkeys[target]["items"] = monkeys[target]["items"] " " w[1];
+    # print w[1],"%",m["test"][1],"=",test;
+    # print "Item with worry level",w[1],"is thrown to monkey",target;
 }
 
 function dump () {
@@ -64,6 +63,12 @@ function dump () {
     }
 }
 
+function dump_lite () {
+    for(i in monkeys){
+        print "monkey" i ": " monkeys[i]["items"]; 
+    }
+}
+
 function dump_array (arr, label) {
     output = ""
     for(j in arr){
@@ -72,28 +77,20 @@ function dump_array (arr, label) {
     print label ":\t" output;
 }
 
-/Monkey [0-9]+/ {
-    curr = $2;
-}
-
-/Starting items/ {
-    for(i=4; i<=NF; i++) monkeys[curr]["items"] = monkeys[curr]["items"] " " $i
-}
-
-/Operation/ {
-    for(i=5; i<=NF; i++) monkeys[curr]["op"][i-4] = $i
-}
-
-/Test: divisible by/ {
-    monkeys[curr]["test"][1] = $5
-}
-
-/If (true)|(false): throw to monkey/ {
-    monkeys[curr]["test"][$3 == "true" ? 2 : 3] = $7
-}
+/Monkey [0-9]+/ { curr = $2 }
+/Starting items/ { for(i=4; i<=NF; i++) monkeys[curr]["items"] = monkeys[curr]["items"] " " $i }
+/Operation/ { for(i=5; i<=NF; i++) monkeys[curr]["op"][i-4] = $i }
+/Test: divisible by/ { monkeys[curr]["test"][1] = $5 }
+/If (true)|(false): throw to monkey/ { monkeys[curr]["test"][$3 == "true" ? 2 : 3] = $7 }
 
 END {
-    for(i=1; i<=20; i++) round();
+    for(r=1; r<=20; r++) {
+        round();
+
+        # print "Round",r;  
+        # dump_lite();
+        # print "";     
+    }
 
     dump();
 }
