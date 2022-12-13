@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Linq;
+
 namespace Advent22.Day11
 {
 
@@ -32,7 +35,7 @@ namespace Advent22.Day11
         }
     }
 
-    public class Graph<T>
+    public class Graph<T> : IEnumerable<Node<T>>
     {
         private Node<T>[,] Nodes { get; init; }
         public int Width { get; init; }
@@ -105,6 +108,19 @@ namespace Advent22.Day11
             }
 
             return path;
+        }
+
+        public IEnumerator<Node<T>> GetEnumerator()
+        {
+            return Enumerable.Range(0, Width)
+                .SelectMany(x => Enumerable.Range(0, Height).Select((y) => (x, y)))
+                .Select(pt => this[pt.Item1, pt.Item2])
+                .GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Nodes.GetEnumerator();
         }
     }
 }

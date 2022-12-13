@@ -26,10 +26,15 @@ namespace Advent22.Day11
                     if (x > 0) TryAddEdge(graph, graph[x - 1, y], graph[x, y]);
                 }
 
+
+            Console.WriteLine($"width: {width}");
+            foreach (var v in graph.First(n => n.Id == 3464).Neighbors)
+            {
+                Console.WriteLine($"neighbor at {v.Id}");
+            }
             // Print(graph, (_, _, n) => n.Value.IsStart);
 
             var path = graph.ShortestPath(start!, end!).ToList();
-
 
             Console.WriteLine(path.Select(n => n.Id.ToString()).Aggregate((a, b) => a != null ? (b != null ? $"{a} {b}" : $"{a}") : $"{b}"));
 
