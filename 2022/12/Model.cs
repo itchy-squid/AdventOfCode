@@ -3,7 +3,6 @@ namespace Advent22.Day11
 
     public record Elevation
     {
-        public int Id { get; init; }
         public int Height { get; init; }
         public bool IsStart { get; init; }
         public bool IsEnd { get; init; }
@@ -21,11 +20,13 @@ namespace Advent22.Day11
 
     public class Node<T>
     {
+        public int Id { get; private init; }
         public T Value { get; private init; }
         public List<Node<T>> Neighbors { get; private init; }
 
-        public Node(T value)
+        public Node(int id, T value)
         {
+            Id = id;
             Value = value;
             Neighbors = new List<Node<T>>();
         }
@@ -43,7 +44,7 @@ namespace Advent22.Day11
             {
                 return Nodes[x, y];
             }
-            set
+            private set
             {
                 Nodes[x, y] = value;
             }
@@ -56,6 +57,11 @@ namespace Advent22.Day11
             Nodes = new Node<T>[width, height];
         }
 
+        public void AddNode(int x, int y, T value)
+        {
+            this[x, y] = new Node<T>(y * Width + x, value);
+        }
+
         public void AddEdge(Node<T> a, Node<T> b)
         {
             a.Neighbors.Add(b);
@@ -64,38 +70,38 @@ namespace Advent22.Day11
 
         public Stack<Node<T>> ShortestPath(Node<T> source, Node<T> target)
         {
-            var distances = new Dictionary<Node<T>, int>();
-            var previous = new Dictionary<Node<T>, Node<T>?>();
+            var distances = new Dictionary<int, int>();
+            var previous = new Dictionary<int, Node<T>?>();
             var toVisit = new List<Node<T>>();
 
             foreach (var n in Nodes)
             {
-                distances[n] = int.MaxValue;
-                previous[n] = null;
+                distances[n.Id] = int.MaxValue;
+                previous[n.Id] = null;
                 toVisit.Add(n);
             }
 
-            distances[source] = 0;
+            distances[source.Id] = 0;
             while (toVisit.Any())
             {
-                var u = toVisit.MinBy(n => distances[n])!;
+                var u = toVisit.MinBy(n => distances[n.Id])!;
                 toVisit.Remove(u);
 
                 foreach (var v in u.Neighbors.Intersect(toVisit))
                 {
-                    var alt = distances[u] + 1;
-                    if (alt < distances[v])
+                    var alt = distances[u.Id] + 1;
+                    if (alt < distances[v.Id])
                     {
-                        distances[v] = alt;
-                        previous[v] = u;
+                        distances[v.Id] = alt;
+                        previous[v.Id] = u;
                     }
                 }
             }
 
             var path = new Stack<Node<T>>();
-            for (var n = target; n != source && n != null; n = n == null ? null : previous[n])
+            for (var n = target; n != null; n = n != null ? previous[n.Id] : null)
             {
-                path.Push(target!);
+                path.Push(n!);
             }
 
             return path;

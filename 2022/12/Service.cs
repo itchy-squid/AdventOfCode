@@ -18,31 +18,24 @@ namespace Advent22.Day11
             foreach (var y in Enumerable.Range(0, length))
                 foreach (var x in Enumerable.Range(0, width))
                 {
-                    var node = new Node<Elevation>(Deserialize(y * width + x, lines[y][x]));
-                    graph[x, y] = node;
-                    Console.WriteLine(node.Value.Id);
-
+                    graph.AddNode(x, y, Deserialize(lines[y][x]));
                     start = (graph[x, y].Value.IsStart) ? graph[x, y] : start;
                     end = (graph[x, y].Value.IsEnd) ? graph[x, y] : end;
-                    if (x > 0) TryAddEdge(graph, graph[x - 1, y], graph[x, y]);
+
                     if (y > 0) TryAddEdge(graph, graph[x, y - 1], graph[x, y]);
+                    if (x > 0) TryAddEdge(graph, graph[x - 1, y], graph[x, y]);
                 }
+
+            // Print(graph, (_, _, n) => n.Value.IsStart);
 
             var path = graph.ShortestPath(start!, end!).ToList();
 
 
-            Console.WriteLine(path.Select(n => n.Value.Id.ToString()).Aggregate((a, b) => a != null ? (b != null ? $"{a} {b}" : $"{a}") : $"{b}"));
+            Console.WriteLine(path.Select(n => n.Id.ToString()).Aggregate((a, b) => a != null ? (b != null ? $"{a} {b}" : $"{a}") : $"{b}"));
 
-            foreach (var y in Enumerable.Range(0, length))
-            {
-                foreach (var x in Enumerable.Range(0, width))
-                {
-                    Console.Write(path.Any(n => n.Value.Id == (y * width + x)) ? "X" : ".");
-                }
-                Console.WriteLine();
-            }
+            Print(graph, n => path.Any(pn => n.Id == pn.Id));
 
-            return path.Count;
+            return path.Count - 1;
         }
 
         private void TryAddEdge(Graph<Elevation> g, Node<Elevation> a, Node<Elevation> b)
@@ -50,13 +43,25 @@ namespace Advent22.Day11
             if (a.Value.IsReachable(b.Value)) g.AddEdge(a, b);
         }
 
-        private static Elevation Deserialize(int id, char c)
+        private static Elevation Deserialize(char c)
         {
             switch (c)
             {
-                case 'S': return new Elevation { Id = id, Height = 1, IsStart = true };
-                case 'E': return new Elevation { Id = id, Height = 26, IsEnd = true };
-                default: return new Elevation { Id = id, Height = c - 'a' + 1 };
+                case 'S': return new Elevation { Height = 1, IsStart = true, IsEnd = false };
+                case 'E': return new Elevation { Height = 26, IsStart = false, IsEnd = true };
+                default: return new Elevation { Height = c - 'a' + 1, IsStart = false, IsEnd = false };
+            }
+        }
+
+        private void Print(Graph<Elevation> g, Func<Node<Elevation>, bool> test)
+        {
+            foreach (var y in Enumerable.Range(0, g.Height))
+            {
+                foreach (var x in Enumerable.Range(0, g.Width))
+                {
+                    Console.Write(test(g[x, y]) ? "X" : ".");
+                }
+                Console.WriteLine();
             }
         }
 
