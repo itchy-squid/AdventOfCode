@@ -75,16 +75,16 @@ namespace Advent22.Day11
             this[x, y] = new Node<T>(ToId(x, y), value);
         }
 
-        public (int, Stack<Node<T>>) ShortestPath(Node<T> source, Node<T> target)
+        public (Dictionary<int, int>, Dictionary<int, int>) ShortestPath(Node<T> source)
         {
             var distances = new Dictionary<int, int>();
-            var previous = new Dictionary<int, Node<T>?>();
+            var previous = new Dictionary<int, int>();
             var toVisit = new HashSet<Node<T>>();
 
             foreach (var n in Nodes)
             {
                 distances[n.Id] = int.MaxValue;
-                previous[n.Id] = null;
+                previous[n.Id] = -1;
                 toVisit.Add(n);
             }
             distances[source.Id] = 0;
@@ -112,18 +112,12 @@ namespace Advent22.Day11
                     if (alt < distances[v.Id])
                     {
                         distances[v.Id] = alt;
-                        previous[v.Id] = u;
+                        previous[v.Id] = u.Id;
                     }
                 }
             }
 
-            var path = new Stack<Node<T>>();
-            for (var n = target; n != null; n = n != null ? previous[n.Id] : null)
-            {
-                path.Push(n!);
-            }
-
-            return (distances[target.Id], path);
+            return (distances, previous);
         }
 
         public IEnumerator<Node<T>> GetEnumerator()
@@ -141,7 +135,7 @@ namespace Advent22.Day11
 
         public void Print(Node<T> curr, List<Node<T>> updating, Dictionary<int, int> distances)
         {
-            var gradient = new[] { '.', ',', ':', ';', '+', '=', 'x', 'X', '$', ' ' };
+            var gradient = new[] { '$', 'X', 'x', '=', '+', ';', ':', ',', '.', ' ' };
 
             var output = new StringBuilder();
 
@@ -152,17 +146,7 @@ namespace Advent22.Day11
                     var equivalentId = ToId(x, y);
                     var hit = updating.Append(curr).Any(n => n.Id == equivalentId);
                     var d = distances[ToId(x, y)];
-
-                    char c = ' ';
-                    try
-                    {
-                        c = gradient[Math.Min(gradient.Length - 1, d / 50)];
-                    }
-                    catch
-                    {
-                        Console.WriteLine($"d: {d}, id = {equivalentId}");
-                        throw;
-                    }
+                    var c = gradient[Math.Min(gradient.Length - 1, d / 57)];
 
                     output = output.Append(hit ? "X" : c);
                 }
@@ -176,7 +160,6 @@ namespace Advent22.Day11
             }
             catch
             {
-
             }
         }
 

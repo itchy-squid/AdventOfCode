@@ -1,44 +1,56 @@
 namespace Advent22.Day11
 {
-    interface ISolver<T>
+    class ProblemSolver
     {
-        T Solve(string[] lines);
-    }
+        private Graph<Elevation> _graph;
+        private Dictionary<int, int> _distances;
+        private int _start;
+        private int _end;
 
-    class Problem1 : ISolver<int>
-    {
-        public int Solve(string[] lines)
+        public ProblemSolver(string[] lines)
         {
             var wid = lines[0].Length;
             var len = lines.Length;
-            var graph = new Graph<Elevation>(wid, len);
+            _graph = new Graph<Elevation>(wid, len);
             var start = (Node<Elevation>?)null;
             var end = (Node<Elevation>?)null;
 
             foreach (var y in Enumerable.Range(0, len))
                 foreach (var x in Enumerable.Range(0, wid))
                 {
-                    graph.AddNode(x, y, Deserialize(lines[y][x]));
-                    start = (graph[x, y].Value.IsStart) ? graph[x, y] : start;
-                    end = (graph[x, y].Value.IsEnd) ? graph[x, y] : end;
+                    _graph.AddNode(x, y, Deserialize(lines[y][x]));
+                    if (_graph[x, y].Value.IsStart) start = _graph[x, y];
+                    if (_graph[x, y].Value.IsEnd) end = _graph[x, y];
                 }
 
             foreach (var y in Enumerable.Range(0, len))
                 foreach (var x in Enumerable.Range(0, wid))
                 {
-                    if (x > 0) TryAddEdge(graph[x, y], graph[x - 1, y]);
-                    if (y > 0) TryAddEdge(graph[x, y], graph[x, y - 1]);
-                    if (y < len - 1) TryAddEdge(graph[x, y], graph[x, y + 1]);
-                    if (x < wid - 1) TryAddEdge(graph[x, y], graph[x + 1, y]);
+                    if (x > 0) TryAddEdge(_graph[x, y], _graph[x - 1, y]);
+                    if (y > 0) TryAddEdge(_graph[x, y], _graph[x, y - 1]);
+                    if (y < len - 1) TryAddEdge(_graph[x, y], _graph[x, y + 1]);
+                    if (x < wid - 1) TryAddEdge(_graph[x, y], _graph[x + 1, y]);
                 }
 
-            var (dist, path) = graph.ShortestPath(start!, end!);
-            return dist;
+            (_distances, _) = _graph!.ShortestPath(end!);
+            _start = start!.Id;
+            _end = end!.Id;
+        }
+
+        public int Solve1()
+        {
+            return _distances![_start];
+        }
+
+        public int Solve2()
+        {
+            var startingPoints = _graph.Where(n => n.Value.Height == 1).Select(n => n.Id);
+            return _distances.Where(kpv => startingPoints.Contains(kpv.Key)).Select(kvp => kvp.Value).Min();
         }
 
         private void TryAddEdge(Node<Elevation> a, Node<Elevation> b)
         {
-            if (b.Value.Height - a.Value.Height <= 1) a.Neighbors.Add(b);
+            if (b.Value.Height - a.Value.Height <= 1) b.Neighbors.Add(a);
         }
 
         private static Elevation Deserialize(char c)
@@ -51,35 +63,6 @@ namespace Advent22.Day11
                 case 'E': return new Elevation { Height = heightFrom('z'), IsStart = false, IsEnd = true };
                 default: return new Elevation { Height = heightFrom(c), IsStart = false, IsEnd = false };
             }
-        }
-
-        private void Print(Graph<Elevation> g, Func<Node<Elevation>, bool> test)
-        {
-            foreach (var y in Enumerable.Range(0, g.Height))
-            {
-                foreach (var x in Enumerable.Range(0, g.Width))
-                {
-                    Console.Write(test(g[x, y]) ? "X" : ".");
-                }
-                Console.WriteLine();
-            }
-        }
-
-        private void Print(Graph<Elevation> graph)
-        {
-            foreach (var y in Enumerable.Range(0, graph.Height))
-            {
-                foreach (var x in Enumerable.Range(0, graph.Width))
-                {
-                    Console.Write(graph[x, y].Value);
-                }
-                Console.WriteLine();
-            }
-        }
-
-        private int ToId(int x, int y, int width)
-        {
-            return y * width + x;
         }
     }
 }

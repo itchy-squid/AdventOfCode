@@ -5,8 +5,9 @@
         public static async Task Main(string[] args)
         {
             var lines = await File.ReadAllLinesAsync(args[0]);
-            var answer = new Problem1().Solve(lines!);
-            Console.WriteLine(answer);
+            var solver = new ProblemSolver(lines!);
+            Console.WriteLine(solver.Solve1());
+            Console.WriteLine(solver.Solve2());
         }
     }
 }
