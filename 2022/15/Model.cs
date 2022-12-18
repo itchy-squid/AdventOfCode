@@ -15,7 +15,6 @@ namespace _15
         public int Min { get; init; }
         public int Max { get; init; }
         public int Size => Max - Min + 1;
-
         public bool Intersects(int n) => Min <= n && n <= Max;
     }
 
@@ -25,7 +24,6 @@ namespace _15
 
         public void Add(int min, int max)
         {
-            // Find the first place where we can start mucking around.
             var startIdx = _ranges.FindIndex(r => r.Min >= min || r.Max >= min);
             var endIdx = _ranges.FindLastIndex(r => r.Min <= max || r.Max <= max);
 
