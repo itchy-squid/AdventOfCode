@@ -9,7 +9,7 @@ using Xunit.Sdk;
 
 namespace AdventOfCode.Day13.Tests;
 
-public class ServiceTests
+public class NodeComparerTests
 {
     [Theory]
     [InlineData("[1,1,3,1]", "[1,1,5,1,1]")]
@@ -19,8 +19,8 @@ public class ServiceTests
     [InlineData("[]", "[3]")]
     public void Inputs_AreOrdered(params string[] lines)
     {
-        var model = Parser.BuildModel(lines);
-        Assert.True(new Solver().IsOrdered(model.ElementAt(0)));
+        var model = Parser.BuildModel(lines).ToArray();
+        Assert.Equal(-1, new NodeComparer().Compare(model[0], model[1]));
     }
 
     [Theory]
@@ -31,13 +31,13 @@ public class ServiceTests
     [InlineData("[1,[2,[3,[4,[5,6,7]]]],8,9]", "[1,[2,[3,[4,[5,6,0]]]],8,9]")]
     public void Inputs_AreNotOrdered(params string[] lines)
     {
-        var model = Parser.BuildModel(lines);
-        Assert.False(new Solver().IsOrdered(model.ElementAt(0)));
+        var model = Parser.BuildModel(lines).ToArray();
+        Assert.Equal(1, new NodeComparer().Compare(model[0], model[1]));
     }
 
     [Theory]
     [SampleFileData("sample.txt", 13)]
-    public async Task SampleFile_MatchesGivenSolution(string[] lines, int expected)
+    public void SampleFile_MatchesGivenSolution(string[] lines, int expected)
     {
         var model = Parser.BuildModel(lines).ToArray();
         var received = new Solver().Solve(model);
