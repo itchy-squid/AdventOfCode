@@ -26,17 +26,12 @@ namespace _15
     {
         public int Solve(IEnumerable<Reading> readings, int line)
         {
-            var calcDist = (int x1, int y1, int x2, int y2) => Math.Abs(x2 - x1) + Math.Abs(y2 - y1);
-
             var ranges = new RangeCollection();
             var beacons = new List<int>();
 
             foreach (var reading in readings)
             {
-                var dist = reading.Signal.Distance(reading.Beacon);
-                var delta = dist - Math.Abs(reading.Signal.Y - line);
-
-                if (delta >= 0) ranges.Add(reading.Signal.X - delta, reading.Signal.X + delta);
+                if (reading.TryGetIntersectingRange(line, out var range)) ranges.Add(range!);
                 if (reading.Beacon.Y == line) beacons.Add(reading.Beacon.X);
             }
 
@@ -49,9 +44,35 @@ namespace _15
 
     public class Problem2
     {
-        public int Solve(IEnumerable<Reading> readings, int searchArea)
+        public long Solve(IEnumerable<Reading> readings, int searchArea)
         {
-            return 0;
+            var ranges = Enumerable.Range(0, searchArea + 1).Select(i => new RangeCollection()).ToArray();
+
+            foreach (var reading in readings)
+            {
+                var dist = reading.Signal.Distance(reading.Beacon);
+                var minY = Math.Max(reading.Signal.Y - dist, 0);
+                var maxY = Math.Min(reading.Signal.Y + dist, searchArea);
+
+                for (var y = minY; y <= maxY; y++)
+                {
+                    if (reading.TryGetIntersectingRange(y, out var range))
+                    {
+                        if (range!.Max < 0) continue;
+                        if (range!.Min > searchArea) continue;
+                        ranges[y].Add(Math.Max(range!.Min, 0), Math.Min(range!.Max, searchArea));
+                    }
+                }
+            }
+
+            var beaconY = ranges!.TakeWhile(rs => rs.Sum(r => r.Size) != searchArea).Count();
+            var beaconX = 0;
+            foreach (var range in ranges[beaconY])
+            {
+                if (range.Intersects(beaconX)) beaconX = range.Max + 1;
+            }
+
+            return beaconX * (long)4000000 + beaconY;
         }
     }
 }

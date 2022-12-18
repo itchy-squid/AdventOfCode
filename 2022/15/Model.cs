@@ -6,6 +6,17 @@ namespace _15
     public static class ManhattanExtensions
     {
         public static int Distance(this Point p1, Point p2) => Math.Abs(p2.X - p1.X) + Math.Abs(p2.Y - p1.Y);
+
+        public static bool TryGetIntersectingRange(this Reading reading, int y, out Range? range)
+        {
+            range = null;
+            var dist = reading.Signal.Distance(reading.Beacon);
+            var delta = dist - Math.Abs(reading.Signal.Y - y);
+            if (delta < 0) return false;
+
+            range = new Range(reading.Signal.X - delta, reading.Signal.X + delta);
+            return true;
+        }
     }
 
     public record Range
@@ -25,6 +36,11 @@ namespace _15
     public class RangeCollection : IEnumerable<Range>
     {
         private List<Range> _ranges = new List<Range>();
+
+        public void Add(Range r)
+        {
+            this.Add(r.Min, r.Max);
+        }
 
         public void Add(int min, int max)
         {
