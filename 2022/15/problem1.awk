@@ -6,7 +6,9 @@ function max(a, b) { return a == "" ? b : a > b ? a : b }
 function dist(x1, y1, x2, y2){ return abs(x1 - x2) + abs(y1 - y2); }
 
 function canHaveBeacon(x){
-    if(beacons[x] == 1) return 1;
+    for(i = 1; i < beaconCount; i++){
+        if(beacons[i] == x) return 1;
+    }
     
     for(i = 1; i < NR; i++){
         split(signals[i], arr, " ");
@@ -38,22 +40,22 @@ BEGIN {
     }
 
     if($8 == LINE){
-        beacons[$6] = 1;
+        beacons[beaconCount++] = $6;
     }
 }
 
 END {
-    output = "";
+    # output = "";
     for(x = minX; x <= maxX; x++){
         if(0 == canHaveBeacon(x)) {
             ct++;
-            output = output "#";
+            # output = output "#";
          }
-         else{
-           output = output ".";        
-        }
+        #  else{
+        #    output = output ".";        
+        # }
     }
 
-    print output
+    # print output
     print ct;
 }
