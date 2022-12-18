@@ -56,8 +56,15 @@ namespace AdventOfCode.Day14
             }
         }
 
+        // public void AddInfiniteBottom(int delta)
+        // {
+        //     this.InfiniteBottom = Bottom + delta;
+        // }
+
         public bool TryAddSand(int x, int y)
         {
+            if (Collides(x, y)) return false;
+
             while (true)
             {
                 if (x < Left) return false;
@@ -69,6 +76,9 @@ namespace AdventOfCode.Day14
                 else if (!Collides(x + 1, y + 1)) x = x + 1;
                 else
                 {
+                    Left = Math.Min(x, Left);
+                    Right = Math.Max(x, Right);
+                    Top = Math.Min(y, Top);
                     _sand.Add(x, y);
                     return true;
                 }

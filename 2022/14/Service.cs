@@ -31,15 +31,17 @@ namespace AdventOfCode.Day14
 
     public class Solver
     {
-        public int Solve(Simulation s)
+        public int Problem1(Simulation s)
         {
             int i;
-            for (i = 0; s.TryAddSand(500, 0); i++)
-            {
-                // new Renderer().Render(s);
-            }
-
+            for (i = 0; s.TryAddSand(500, 0); i++) ; //new Renderer().Render(s);
             return i;
+        }
+
+        public int Problem2(Simulation s)
+        {
+            s.AddRock(s.Left - s.Bottom, s.Bottom + 2, s.Right + s.Bottom, s.Bottom + 2);
+            return Problem1(s);
         }
     }
 

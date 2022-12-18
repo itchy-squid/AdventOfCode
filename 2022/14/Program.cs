@@ -6,9 +6,8 @@
         {
             var file = args.Length == 0 ? "test.txt" : args[0];
             var lines = await File.ReadAllLinesAsync(file);
-            var model = new Parser().BuildModel(lines);
-            var answer = new Solver().Solve(model);
-            Console.WriteLine(answer);
+            Console.WriteLine(new Solver().Problem1(new Parser().BuildModel(lines)));
+            Console.WriteLine(new Solver().Problem2(new Parser().BuildModel(lines)));
         }
     }
 }
