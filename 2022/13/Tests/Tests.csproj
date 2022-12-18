@@ -24,4 +24,11 @@
     <ProjectReference Include="..\Solution\Solution.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssetsSourceFiles Include="*.txt"/>
+  </ItemGroup>
+
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(AssetsSourceFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>
