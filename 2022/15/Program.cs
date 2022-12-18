@@ -1,31 +1,29 @@
-﻿using System.Text.RegularExpressions;
-using _15;
+﻿using _15;
 
-var LINE = args.Length > 1 ? Int32.Parse(args[1]) : 10;
-var FILE = args.Any() ? args[0] : "file.txt";
+var modes = new Dictionary<string, Configuration>() { { "test", Configurations.Test }, { "input", Configurations.Input } };
+var mode = args.Any() ? modes[args[0]] : Configurations.Test;
 
-var calcDist = (int x1, int y1, int x2, int y2) => Math.Abs(x2 - x1) + Math.Abs(y2 - y1);
+var lines = await File.ReadAllLinesAsync(mode.Filename);
+var model = Parser.BuildModel(lines);
 
-var lines = await File.ReadAllLinesAsync(FILE);
-var ranges = new RangeCollection();
-var beacons = new List<int>();
+Console.WriteLine(new Problem1().Solve(model, mode.Line));
+Console.WriteLine(new Problem2().Solve(model, mode.Search));
 
-var pattern = @"-?\d+";
-
-foreach (var line in lines)
+public partial class Program
 {
-    var pt = Regex.Matches(line, pattern).Where(m => m.Success).Select(m => Int32.Parse(m.Value)).ToArray();
-    var dist = calcDist(pt[0], pt[1], pt[2], pt[3]);
-    var delta = dist - Math.Abs(pt[1] - LINE);
+    public record Configuration
+    {
+        public string Filename { get; init; } = null!;
+        public int Line { get; init; }
+        public int Search { get; init; }
+    }
 
-    if (delta >= 0) ranges.Add(pt[0] - delta, pt[0] + delta);
-    if (pt[3] == LINE) beacons.Add(pt[2]);
+    public static class Configurations
+    {
+        public static Configuration Test = new Configuration() { Filename = "test.txt", Line = 10, Search = 20 };
+        public static Configuration Input = new Configuration() { Filename = "input.txt", Line = 2000000, Search = 4000000 };
+    }
 }
-
-var size = ranges.Sum(r => r.Size);
-foreach (var beacon in beacons.Distinct()) size -= ranges.Where(r => r.Intersects(beacon)).Count();
-
-Console.WriteLine(size);
 
 
 
