@@ -46,7 +46,7 @@ namespace AdventOfCode.Day13
         }
     }
 
-    public class Solver
+    public class Problem1
     {
         public int Solve(IEnumerable<ListNode> models)
         {
@@ -63,6 +63,21 @@ namespace AdventOfCode.Day13
             }
 
             return sum;
+        }
+    }
+
+    public class Problem2
+    {
+        public int Solve(IEnumerable<ListNode> models)
+        {
+            var d1 = Parser.BuildModel("[[2]]");
+            var d2 = Parser.BuildModel("[[6]]");
+
+            var sortedList = models.Concat(new[] { d1, d2 }).OrderBy(x => x, new NodeComparer()).ToList();
+            var i1 = sortedList.IndexOf(d1) + 1;
+            var i2 = sortedList.IndexOf(d2) + 1;
+
+            return i1 * i2;
         }
     }
 

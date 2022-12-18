@@ -37,10 +37,19 @@ public class NodeComparerTests
 
     [Theory]
     [SampleFileData("sample.txt", 13)]
-    public void SampleFile_MatchesGivenSolution(string[] lines, int expected)
+    public void SampleFile_Problem1_MatchesGivenSolution(string[] lines, int expected)
     {
         var model = Parser.BuildModel(lines).ToArray();
-        var received = new Solver().Solve(model);
+        var received = new Problem1().Solve(model);
+        Assert.Equal(expected, received);
+    }
+
+    [Theory]
+    [SampleFileData("sample.txt", 140)]
+    public void SampleFile_Problem2_MatchesGivenSolution(string[] lines, int expected)
+    {
+        var model = Parser.BuildModel(lines).ToArray();
+        var received = new Problem2().Solve(model);
         Assert.Equal(expected, received);
     }
 
