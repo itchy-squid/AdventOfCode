@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 
 namespace Advent22.Day11
 {
@@ -14,11 +16,6 @@ namespace Advent22.Day11
         {
             return (char)('a' + e.Height - 1);
         }
-
-        public bool IsReachable(Elevation e)
-        {
-            return Math.Abs(this.Height - e.Height) <= 1;
-        }
     }
 
     public class Node<T>
@@ -32,6 +29,19 @@ namespace Advent22.Day11
             Id = id;
             Value = value;
             Neighbors = new List<Node<T>>();
+        }
+    }
+
+    public class NodeComparer<T> : IEqualityComparer<Node<T>>
+    {
+        public bool Equals(Node<T>? x, Node<T>? y)
+        {
+            return x?.Id == y?.Id;
+        }
+
+        public int GetHashCode([DisallowNull] Node<T> obj)
+        {
+            return obj.Id;
         }
     }
 
@@ -62,52 +72,52 @@ namespace Advent22.Day11
 
         public void AddNode(int x, int y, T value)
         {
-            this[x, y] = new Node<T>(y * Width + x, value);
+            this[x, y] = new Node<T>(ToId(x, y), value);
         }
 
-        public void AddEdge(Node<T> a, Node<T> b)
-        {
-            a.Neighbors.Add(b);
-            b.Neighbors.Add(a);
-        }
-
-        public Stack<Node<T>> ShortestPath(Node<T> source, Node<T> target)
+        public (Dictionary<int, int>, Dictionary<int, int>) ShortestPath(Node<T> source)
         {
             var distances = new Dictionary<int, int>();
-            var previous = new Dictionary<int, Node<T>?>();
-            var toVisit = new List<Node<T>>();
+            var previous = new Dictionary<int, int>();
+            var toVisit = new HashSet<Node<T>>();
 
             foreach (var n in Nodes)
             {
                 distances[n.Id] = int.MaxValue;
-                previous[n.Id] = null;
+                previous[n.Id] = -1;
                 toVisit.Add(n);
             }
-
             distances[source.Id] = 0;
+
             while (toVisit.Any())
             {
                 var u = toVisit.MinBy(n => distances[n.Id])!;
                 toVisit.Remove(u);
 
-                foreach (var v in u.Neighbors.Intersect(toVisit))
+                if (distances[u.Id] == int.MaxValue || distances[u.Id] < 0)
+                {
+                    var output = new StringBuilder();
+                    output = output.AppendLine($"Visiting unreachable node ({ToX(u.Id)},{ToY(u.Id)}) with d={distances[u.Id]}");
+                    foreach (var n in u.Neighbors) output = output.AppendLine($"  neighbor at ({ToX(n.Id)},{ToY(n.Id)}) with d={distances[n.Id]}");
+                    break;
+                }
+
+                var neighbors = toVisit.Intersect(u.Neighbors, new NodeComparer<T>()).ToList();
+
+                Print(u, neighbors, distances);
+
+                foreach (var v in neighbors)
                 {
                     var alt = distances[u.Id] + 1;
                     if (alt < distances[v.Id])
                     {
                         distances[v.Id] = alt;
-                        previous[v.Id] = u;
+                        previous[v.Id] = u.Id;
                     }
                 }
             }
 
-            var path = new Stack<Node<T>>();
-            for (var n = target; n != null; n = n != null ? previous[n.Id] : null)
-            {
-                path.Push(n!);
-            }
-
-            return path;
+            return (distances, previous);
         }
 
         public IEnumerator<Node<T>> GetEnumerator()
@@ -121,6 +131,51 @@ namespace Advent22.Day11
         IEnumerator IEnumerable.GetEnumerator()
         {
             return Nodes.GetEnumerator();
+        }
+
+        public void Print(Node<T> curr, List<Node<T>> updating, Dictionary<int, int> distances)
+        {
+            var gradient = new[] { '$', 'X', 'x', '=', '+', ';', ':', ',', '.', ' ' };
+
+            var output = new StringBuilder();
+
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    var equivalentId = ToId(x, y);
+                    var hit = updating.Append(curr).Any(n => n.Id == equivalentId);
+                    var d = distances[ToId(x, y)];
+                    var c = gradient[Math.Min(gradient.Length - 1, d / 57)];
+
+                    output = output.Append(hit ? "X" : c);
+                }
+                output = output.AppendLine();
+            }
+
+            try
+            {
+                Console.SetCursorPosition(0, 0);
+                Console.Write(output.ToString());
+            }
+            catch
+            {
+            }
+        }
+
+        private int ToId(int x, int y)
+        {
+            return y * Width + x;
+        }
+
+        private int ToX(int id)
+        {
+            return id % Width;
+        }
+
+        private int ToY(int id)
+        {
+            return (id - ToX(id)) / Width;
         }
     }
 }
