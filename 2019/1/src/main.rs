@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Error};
 use std::path::Path;
 
-// Day 1 : The Tyranny of the Rocket Equation 
+// Day 1 : "The Tyranny of the Rocket Equation"
 // The world's most painful Day 1
 fn main() -> Result<(), Error> {
     let path_to_read= Path::new("../inputs/1-1.txt");
